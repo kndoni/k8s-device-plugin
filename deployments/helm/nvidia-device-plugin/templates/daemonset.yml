@@ -88,11 +88,16 @@ spec:
           value: ""
         - name: PROCESS_TO_SIGNAL
           value: ""
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
           - name: available-configs
             mountPath: /available-configs
           - name: config
             mountPath: /config
+        securityContext:
+          {{- include "nvidia-device-plugin.securityContext" . | nindent 10 }}
       {{- end }}
       containers:
       {{- if eq $hasConfigMap "true" }}
@@ -124,6 +129,9 @@ spec:
           value: "1" # SIGHUP
         - name: PROCESS_TO_SIGNAL
           value: "nvidia-device-plugin"
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
           - name: available-configs
             mountPath: /available-configs
@@ -178,6 +186,9 @@ spec:
         {{- end }}
         securityContext:
           {{- include "nvidia-device-plugin.securityContext" . | nindent 10 }}
+          capabilities:
+            add:
+              - SYS_ADMIN
         volumeMounts:
           - name: device-plugin
             mountPath: /var/lib/kubelet/device-plugins
